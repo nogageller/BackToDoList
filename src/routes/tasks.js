@@ -6,7 +6,7 @@ const dbMiddleware = require('../middlewares/dbMiddleware.js');
 
 const router = Router();
 
-router.use('/', dbMiddleware('tasks'));
+router.use('/', dbMiddleware(process.env.NODE_ENV === 'test' ? 'testTasks' : 'tasks'));
 
 router.post('/', validateTask, createTask)
 router.delete('/:id', validateId, deleteTask)

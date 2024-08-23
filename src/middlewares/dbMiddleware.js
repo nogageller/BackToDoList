@@ -5,8 +5,9 @@ const HttpStatus = require('../enums/responseSatus.js');
 const dbMiddleware = (collectionName) => {
     return async (req, res, next) => {
         try {
+            const dbName = process.env.NODE_ENV === 'test' ? 'testdb' : 'toDoList';
             // Connect to the database and attach the connection to the request object
-            req.db = await connectDB();
+            req.db = await connectDB(dbName);
 
             // Initialize collection operations for the specified collection
             req.collectionOperations = getCollectionOperations(collectionName);

@@ -6,12 +6,12 @@ const client = new MongoClient(uri);
 
 let db = null;
 
-const connectDB = async () => {
+const connectDB = async (dbName) => {
     if (!db) {
         try {
             await client.connect();
-            db = client.db('toDoList'); 
-            console.log('Connected to database');
+            db = client.db(dbName); 
+            console.log(`Connected to database: ${db.databaseName}`);
         } catch (error) {
             console.error('Failed to connect to database', error);
             throw error;
