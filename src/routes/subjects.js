@@ -6,7 +6,7 @@ const dbMiddleware = require('../middlewares/dbMiddleware.js');
 
 const router = Router();
 
-router.use('/', dbMiddleware('subjects'));
+router.use('/', dbMiddleware(process.env.NODE_ENV === 'test' ? 'testSubjects' : 'subjects'));
 
 router.post('/', validateSubject, createSubject)
 router.delete('/:id', validateId, deleteSubject)

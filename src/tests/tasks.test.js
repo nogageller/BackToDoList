@@ -18,7 +18,7 @@ let db;
 let client;
 
 beforeAll(async () => {
-    client = await MongoClient.connect(mongoUrl, { useNewUrlParser: true, useUnifiedTopology: true });
+    client = await MongoClient.connect(mongoUrl);
     db = client.db('testdb'); // Use a separate test database
     console.log(`Connected to database: ${db.databaseName}`); // Debugging line
 });
@@ -91,7 +91,7 @@ describe('Task Routes', () => {
             isChecked: false,
         });
 
-        const response = await request(app).delete(`/tasks/${taskId.toString()}`);
+        const response = await request(app).delete(`/tasks/${taskId}`);
 
         expect(response.status).toBe(HttpStatus.OK);
 
@@ -115,6 +115,20 @@ describe('Task Routes', () => {
         const response = await request(app).delete(`/tasks/${fakeId}`);
 
         expect(response.status).toBe(HttpStatus.NOT_FOUND);
+    });
+
+    it('should return 400 for another task parameter which is not allowed', async () => {
+        const task = {
+            name: 'Test Task',
+            subject: 'Testing',
+            priority: 10,
+            isChecked: false,
+            date: 10,
+        };
+
+        const response = await request(app).post('/tasks').send(task);
+
+        expect(response.status).toBe(HttpStatus.BAD_REQUEST);
     });
 });
 
