@@ -1,6 +1,5 @@
 const { connectDB, getCollectionOperations } = require('../db/connect.js');
-const HttpStatus = require('../enums/responseSatus.js');
-
+const { StatusCodes } = require('http-status-codes');
 
 const dbMiddleware = (collectionName) => {
     return async (req, res, next) => {
@@ -15,7 +14,7 @@ const dbMiddleware = (collectionName) => {
             next();
         } catch (error) {
             console.error('Database connection error:', error);
-            res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: 'Failed to connect to database', error });
+            res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: 'Failed to connect to database', error });
         }
     };
 };

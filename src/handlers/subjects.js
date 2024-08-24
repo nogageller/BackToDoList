@@ -1,6 +1,7 @@
 const { ObjectId } = require('mongodb');
 const Joi = require('joi');
-const HttpStatus = require('../enums/responseSatus');
+const { StatusCodes } = require('http-status-codes');
+
 
 
 const subjectHandler = {
@@ -8,10 +9,10 @@ const subjectHandler = {
         try {
             const { body } = req;
             const result = await req.collectionOperations.insertOne(body);
-            return res.status(HttpStatus.CREATED).json(result);
+            return res.status(StatusCodes.CREATED).json(result);
         } catch (error) {
             console.error('Error adding task:', error);
-            return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: 'Error adding subject', error });
+            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: 'Error adding subject', error });
         }
     },
 
@@ -22,21 +23,21 @@ const subjectHandler = {
             const result = await req.collectionOperations.deleteOne({ _id: objectId });
 
             if (result.deletedCount === 0) {
-                return res.status(HttpStatus.NOT_FOUND).json({ message: 'Task not found' });
+                return res.status(StatusCodes.NOT_FOUND).json({ message: 'Task not found' });
             }
 
-            return res.status(HttpStatus.OK).json(result);
+            return res.status(StatusCodes.OK).json(result);
         } catch (error) {
-            return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: 'Error deleting subject', error });
+            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: 'Error deleting subject', error });
         }
     },
 
     getSubjects: async (req, res) => {
         try {
             const subjects = await req.collectionOperations.find({});
-            return res.status(HttpStatus.OK).json(subjects);
+            return res.status(StatusCodes.OK).json(subjects);
         } catch (error) {
-            return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: 'Error geting subjects', error });
+            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: 'Error geting subjects', error });
         }
     },
 
@@ -55,12 +56,12 @@ const subjectHandler = {
             );
 
             if (result.matchedCount === 0) {
-                return res.status(HttpStatus.NOT_FOUND).json({ message: 'Subject not found' });
+                return res.status(StatusCodes.NOT_FOUND).json({ message: 'Subject not found' });
             }
 
-            return res.status(HttpStatus.OK).json(result);
+            return res.status(StatusCodes.OK).json(result);
         } catch (error) {
-            return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: 'Error updating subject', error });
+            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: 'Error updating subject', error });
         }
     }
 }

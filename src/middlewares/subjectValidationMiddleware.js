@@ -1,5 +1,5 @@
 const { subjectSchema } = require('../schemas/subjectSchema');
-const HttpStatus = require('../enums/responseSatus.js');
+const { StatusCodes } = require('http-status-codes');
 
 // Middleware to validate subject creation and update
 const validateSubject = (req, res, next) => {
@@ -8,7 +8,7 @@ const validateSubject = (req, res, next) => {
         allowUnknown: false
     });
     if (error) {
-        return res.status(HttpStatus.BAD_REQUEST).json({ message: 'Invalid request data', details: error.details });
+        return res.status(StatusCodes.BAD_REQUEST).json({ message: 'Invalid request data', details: error.details });
     }
     next();
 };

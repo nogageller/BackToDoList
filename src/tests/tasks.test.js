@@ -3,7 +3,7 @@ const express = require('express');
 const { MongoClient } = require('mongodb');
 const taskRouter = require('../routes/tasks');
 const createTaskFactory = require('./factories/taskFactory');
-const HttpStatus = require('../enums/responseSatus'); 
+const { StatusCodes } = require('http-status-codes');
 require('dotenv').config({ path: '.env.test' });
 const { ObjectId } = require('mongodb');
 
@@ -46,7 +46,7 @@ describe('Task Routes', () => {
 
         const response = await request(app).post('/tasks').send(task);
 
-        expect(response.status).toBe(HttpStatus.CREATED);
+        expect(response.status).toBe(StatusCodes.CREATED);
         expect(response.body).toHaveProperty('insertedId');
     });
 
@@ -60,7 +60,7 @@ describe('Task Routes', () => {
 
         const response = await request(app).get('/tasks');
 
-        expect(response.status).toBe(HttpStatus.OK);
+        expect(response.status).toBe(StatusCodes.OK);
         expect(response.body).toHaveLength(1);
     });
 
@@ -76,7 +76,7 @@ describe('Task Routes', () => {
             .put(`/tasks/${taskId}`)
             .send({ name: 'Updated Task', priority: 10 });
 
-        expect(response.status).toBe(HttpStatus.OK);
+        expect(response.status).toBe(StatusCodes.OK);
 
         const updatedTask = await db.collection('testTasks').findOne({ _id: taskId });
         expect(updatedTask.name).toBe('Updated Task');
@@ -93,7 +93,7 @@ describe('Task Routes', () => {
 
         const response = await request(app).delete(`/tasks/${taskId}`);
 
-        expect(response.status).toBe(HttpStatus.OK);
+        expect(response.status).toBe(StatusCodes.OK);
 
         const deletedTask = await db.collection('testTasks').findOne({ _id: taskId });
         expect(deletedTask).toBeNull();
@@ -106,7 +106,7 @@ describe('Task Routes', () => {
             .put(`/tasks/${fakeId}`)
             .send({ name: 'Updated Task' });
 
-        expect(response.status).toBe(HttpStatus.NOT_FOUND);
+        expect(response.status).toBe(StatusCodes.NOT_FOUND);
     });
 
     it('should return 404 for non-existent task on delete', async () => {
@@ -114,7 +114,7 @@ describe('Task Routes', () => {
 
         const response = await request(app).delete(`/tasks/${fakeId}`);
 
-        expect(response.status).toBe(HttpStatus.NOT_FOUND);
+        expect(response.status).toBe(StatusCodes.NOT_FOUND);
     });
 
     it('should return 400 for another task parameter which is not allowed', async () => {
@@ -128,7 +128,7 @@ describe('Task Routes', () => {
 
         const response = await request(app).post('/tasks').send(task);
 
-        expect(response.status).toBe(HttpStatus.BAD_REQUEST);
+        expect(response.status).toBe(StatusCodes.BAD_REQUEST);
     });
 });
 

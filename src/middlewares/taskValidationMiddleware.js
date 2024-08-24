@@ -1,5 +1,5 @@
 const { taskSchema, updateTaskSchema } = require('../schemas/tasksSchema');
-const HttpStatus = require('../enums/responseSatus.js');
+const { StatusCodes } = require('http-status-codes');
 
 // Middleware to validate task creation
 const validateTask = (req, res, next) => {
@@ -8,7 +8,7 @@ const validateTask = (req, res, next) => {
         allowUnknown: false 
     });
     if (error) {
-        return res.status(HttpStatus.BAD_REQUEST).json({ message: 'Invalid request data', details: error.details });
+        return res.status(StatusCodes.BAD_REQUEST).json({ message: 'Invalid request data', details: error.details });
     }
     next();
 };
@@ -20,7 +20,7 @@ const validateUpdateTask = (req, res, next) => {
         allowUnknown: false
     });
     if (error) {
-        return res.status(HttpStatus.BAD_REQUEST).json({ message: 'Invalid update data', details: error.details });
+        return res.status(StatusCodes.BAD_REQUEST).json({ message: 'Invalid update data', details: error.details });
     }
     next();
 };

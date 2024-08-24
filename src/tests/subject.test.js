@@ -2,7 +2,7 @@ const request = require('supertest');
 const express = require('express');
 const { MongoClient } = require('mongodb');
 const subjectRouter = require('../routes/subjects');
-const HttpStatus = require('../enums/responseSatus');
+const { StatusCodes } = require('http-status-codes');
 require('dotenv').config({ path: '.env.test' });
 const { ObjectId } = require('mongodb');
 const createSubjectFactory = require('./factories/subjectFactory');
@@ -43,7 +43,7 @@ describe('Subject Routes', () => {
 
         const response = await request(app).post('/subjects').send(subject);
 
-        expect(response.status).toBe(HttpStatus.CREATED);
+        expect(response.status).toBe(StatusCodes.CREATED);
         expect(response.body).toHaveProperty('insertedId');
     });
 
@@ -54,7 +54,7 @@ describe('Subject Routes', () => {
 
         const response = await request(app).get('/subjects');
 
-        expect(response.status).toBe(HttpStatus.OK);
+        expect(response.status).toBe(StatusCodes.OK);
         expect(response.body).toHaveLength(1);
     });
 
@@ -67,7 +67,7 @@ describe('Subject Routes', () => {
             .put(`/subjects/${subjectId}`)
             .send({ name: 'Updated subject' });
 
-        expect(response.status).toBe(HttpStatus.OK);
+        expect(response.status).toBe(StatusCodes.OK);
 
         const updatedsubject = await db.collection('testSubjects').findOne({ _id: subjectId });
         expect(updatedsubject.name).toBe('Updated subject');
@@ -80,7 +80,7 @@ describe('Subject Routes', () => {
 
         const response = await request(app).delete(`/subjects/${subjectId}`);
 
-        expect(response.status).toBe(HttpStatus.OK);
+        expect(response.status).toBe(StatusCodes.OK);
 
         const deletedsubject = await db.collection('testSubjects').findOne({ _id: subjectId });
         expect(deletedsubject).toBeNull();
@@ -93,7 +93,7 @@ describe('Subject Routes', () => {
             .put(`/subjects/${fakeId}`)
             .send({ name: 'Updated subject' });
 
-        expect(response.status).toBe(HttpStatus.NOT_FOUND);
+        expect(response.status).toBe(StatusCodes.NOT_FOUND);
     });
 
     it('should return 404 for non-existent subject on delete', async () => {
@@ -101,7 +101,7 @@ describe('Subject Routes', () => {
 
         const response = await request(app).delete(`/subjects/${fakeId}`);
 
-        expect(response.status).toBe(HttpStatus.NOT_FOUND);
+        expect(response.status).toBe(StatusCodes.NOT_FOUND);
     });
 
     it('should return 400 for another subject parameter which is not allowed', async () => {
@@ -112,7 +112,7 @@ describe('Subject Routes', () => {
 
         const response = await request(app).post('/subjects').send(subject);
 
-        expect(response.status).toBe(HttpStatus.BAD_REQUEST);
+        expect(response.status).toBe(StatusCodes.BAD_REQUEST);
     });
 });
 

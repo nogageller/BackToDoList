@@ -1,6 +1,6 @@
 const { ObjectId } = require('mongodb');
 const Joi = require('joi');
-const HttpStatus = require('../enums/responseSatus');
+const { StatusCodes } = require('http-status-codes');
 
 
 const taskHandler = {
@@ -8,10 +8,10 @@ const taskHandler = {
         try {
             const { body } = req;
             const result = await req.collectionOperations.insertOne(body);
-            return res.status(HttpStatus.CREATED).json(result);
+            return res.status(StatusCodes.CREATED).json(result);
         } catch (error) {
             console.error('Error adding task:', error);
-            return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: 'Error adding task', error });
+            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: 'Error adding task', error });
         }
     },
 
@@ -22,23 +22,23 @@ const taskHandler = {
             const result = await req.collectionOperations.deleteOne({ _id: objectId });
 
             if (result.deletedCount === 0) {
-                return res.status(HttpStatus.NOT_FOUND).json({ message: 'Task not found' });
+                return res.status(StatusCodes.NOT_FOUND).json({ message: 'Task not found' });
             }
 
-            return res.status(HttpStatus.OK).json(result);
+            return res.status(StatusCodes.OK).json(result);
         } catch (error) {
             console.error('Error adding task:', error);
-            return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: 'Error deleting task', error });
+            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: 'Error deleting task', error });
         }
     }, 
 
     getTasks: async(req, res) => {
         try {
             const tasks = await req.collectionOperations.find({});
-            return res.status(HttpStatus.OK).json(tasks);
+            return res.status(StatusCodes.OK).json(tasks);
         } catch (error) {
             console.error('Error adding task:', error);
-            return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: 'Error geting tasks', error });
+            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: 'Error geting tasks', error });
         }
     },
 
@@ -60,13 +60,13 @@ const taskHandler = {
             );
 
             if (result.matchedCount === 0) {
-                return res.status(HttpStatus.NOT_FOUND).json({ message: 'Task not found' });
+                return res.status(StatusCodes.NOT_FOUND).json({ message: 'Task not found' });
             }
 
-            return res.status(HttpStatus.OK).json(result);
+            return res.status(StatusCodes.OK).json(result);
         } catch (error) {
             console.error('Error adding task:', error);
-            return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: 'Error updating task', error });
+            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: 'Error updating task', error });
         }
 
     }
