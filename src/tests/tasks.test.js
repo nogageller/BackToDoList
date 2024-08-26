@@ -1,11 +1,10 @@
 const request = require('supertest');
 const express = require('express');
-const { MongoClient } = require('mongodb');
-const taskRouter = require('../routes/tasks');
-const createTaskFactory = require('./factories/taskFactory');
+const { MongoClient, ObjectId } = require('mongodb');
 const { StatusCodes } = require('http-status-codes');
 require('dotenv').config({ path: '.env.test' });
-const { ObjectId } = require('mongodb');
+const taskRouter = require('../routes/tasks.js');
+const createTaskFactory = require('./factories/taskFactory.js');
 
 process.env.NODE_ENV = 'test';
 

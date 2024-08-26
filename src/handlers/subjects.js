@@ -23,7 +23,7 @@ const subjectHandler = {
             const result = await req.collectionOperations.deleteOne({ _id: objectId });
 
             if (result.deletedCount === 0) {
-                return res.status(StatusCodes.NOT_FOUND).json({ message: 'Task not found' });
+                return res.status(StatusCodes.NOT_FOUND).json({ message: 'Subject not found' });
             }
 
             return res.status(StatusCodes.OK).json(result);

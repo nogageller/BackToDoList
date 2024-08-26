@@ -14,17 +14,7 @@ const updateTaskSchema = Joi.object({
     isChecked: Joi.boolean()
 }).min(1).strict();
 
-const subjectSchema = Joi.object({
-    name: Joi.string().min(3).max(50).required()
-}).strict();
-
-const idSchema = Joi.object({
-    id: Joi.string().length(24).hex().required()
-});
-
 module.exports = {
     taskSchema,
-    subjectSchema,
-    updateTaskSchema,
-    idSchema
+    updateTaskSchema
 };

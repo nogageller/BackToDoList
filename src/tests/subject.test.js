@@ -1,11 +1,10 @@
 const request = require('supertest');
 const express = require('express');
-const { MongoClient } = require('mongodb');
-const subjectRouter = require('../routes/subjects');
+const { ObjectId, MongoClient } = require('mongodb');
 const { StatusCodes } = require('http-status-codes');
 require('dotenv').config({ path: '.env.test' });
-const { ObjectId } = require('mongodb');
-const createSubjectFactory = require('./factories/subjectFactory');
+const subjectRouter = require('../routes/subjects.js');
+const createSubjectFactory = require('./factories/subjectFactory.js');
 
 process.env.NODE_ENV = 'test';
 

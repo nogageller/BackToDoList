@@ -1,5 +1,5 @@
-const { connectDB, getCollectionOperations } = require('../db/connect.js');
 const { StatusCodes } = require('http-status-codes');
+const { connectDB, getCollectionOperations } = require('../db/connect.js');
 
 const dbMiddleware = (collectionName) => {
     return async (req, res, next) => {
