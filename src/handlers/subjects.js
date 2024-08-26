@@ -3,7 +3,6 @@ const Joi = require('joi');
 const { StatusCodes } = require('http-status-codes');
 
 
-
 const subjectHandler = {
     createSubject: async (req, res) => {
         try {
