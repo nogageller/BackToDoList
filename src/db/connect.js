@@ -24,6 +24,8 @@ const connectDB = async (dbName) => {
 const closeDB = async () => {
     try {
         await client.close();
+        client = null;  
+        db = null;
         console.log('Database connection closed');
     } catch (error) {
         console.error('Error closing database connection', error);
