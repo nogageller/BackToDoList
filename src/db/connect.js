@@ -1,17 +1,18 @@
 const { MongoClient } = require("mongodb");
 require('dotenv').config();
 
-const uri = process.env.MONGODB_URI; 
+const uri = process.env.MONGODB_URI;
 
-const client = new MongoClient(uri);
+let client = new MongoClient(uri);
 
 let db = null;
 
-const connectDB = async (dbName) => {
+const connectDB = async () => {
     if (!db) {
         try {
+            const dbName = process.env.DB_NAME;
             await client.connect();
-            db = client.db(dbName); 
+            db = client.db(dbName);
             console.log(`Connected to database: ${db.databaseName}`);
         } catch (error) {
             console.error('Failed to connect to database', error);
@@ -24,7 +25,7 @@ const connectDB = async (dbName) => {
 const closeDB = async () => {
     try {
         await client.close();
-        client = null;  
+        client = null;
         db = null;
         console.log('Database connection closed');
     } catch (error) {
@@ -33,17 +34,13 @@ const closeDB = async () => {
 }
 
 const getCollectionOperations = (collectionName) => {
-    if (!db) {
-        throw new Error('Database not initialized. Call connectDB first.');
-    }
-
-    const collection = db.collection(collectionName);
-
     return {
-        insertOne: async (document) => collection.insertOne(document),
-        deleteOne: async (...args) => collection.deleteOne(...args),
-        find: async (...args) => collection.find(...args).toArray(),
-        updateOne: async (...args) => collection.updateOne(...args)
+        insertOne: async (document) => db.collection(collectionName).insertOne(document),
+        deleteOne: async (...args) => db.collection(collectionName).deleteOne(...args),
+        find: async (...args) => db.collection(collectionName).find(...args).toArray(),
+        findOne: (...args) => db.collection(collectionName).findOne(...args),
+        updateOne: async (...args) => db.collection(collectionName).updateOne(...args),
+        deleteMany: async (...args) => db.collection(collectionName).deleteMany(...args)
     };
 };
 

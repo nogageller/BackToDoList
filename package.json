@@ -1,10 +1,10 @@
 {
   "name": "backToDoList",
   "version": "1.0.0",
-  "main": "src/app.js",
+  "main": "./index.js",
   "scripts": {
-    "dev": "nodemon app.js",
-    "start": "node./src/app.js",
+    "dev": "nodemon ./index.js",
+    "start": "node ./index.js",
     "test": "jest"
   },
   "keywords": [],

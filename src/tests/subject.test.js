@@ -1,10 +1,10 @@
 const request = require('supertest');
 const express = require('express');
-const { ObjectId, MongoClient } = require('mongodb');
+const { ObjectId } = require('mongodb');
 const { StatusCodes } = require('http-status-codes');
-require('dotenv').config({ path: '.env.test' });
 const subjectRouter = require('../routes/subjects.js');
 const createSubjectFactory = require('./factories/subjectFactory.js');
+const { connectDB, closeDB, getCollectionOperations } = require('../db/connect.js');
 
 process.env.NODE_ENV = 'test';
 
@@ -12,25 +12,20 @@ const app = express();
 app.use(express.json());
 app.use('/subjects', subjectRouter);
 
-const mongoUrl = 'mongodb://localhost:27017';
-let db;
-let client;
+const testOperations = getCollectionOperations('testSubjects');
 
 beforeAll(async () => {
-    client = await MongoClient.connect(mongoUrl);
-    db = client.db('testdb'); // Use a separate test database
-    console.log(`Connected to database: ${db.databaseName}`); // Debugging line
+    await connectDB()
 });
 
 afterAll(async () => {
-    await client.close();
+    await closeDB()
 });
 
 beforeEach(async () => {
     console.log('Clearing collection');
-    await db.collection('testSubjects').deleteMany({});
-    // After deleting subjects
-    const subjects = await db.collection('testSubjects').find({}).toArray();
+    await testOperations.deleteMany({});
+    const subjects = await testOperations.find({});
     console.log('subjects in DB after cleanup:', subjects);
 });
 
@@ -47,7 +42,7 @@ describe('Subject Routes', () => {
     });
 
     it('should get all subjects', async () => {
-        await createSubjectFactory(db, {
+        await createSubjectFactory(testOperations, {
             name: 'Test subject'
         });
 
@@ -58,7 +53,7 @@ describe('Subject Routes', () => {
     });
 
     it('should update a subject', async () => {
-        const subjectId = await createSubjectFactory(db, {
+        const subjectId = await createSubjectFactory(testOperations, {
             name: 'Old subject'
         });
 
@@ -68,12 +63,12 @@ describe('Subject Routes', () => {
 
         expect(response.status).toBe(StatusCodes.OK);
 
-        const updatedsubject = await db.collection('testSubjects').findOne({ _id: subjectId });
+        const updatedsubject = await testOperations.findOne({ _id: subjectId });
         expect(updatedsubject.name).toBe('Updated subject');
     });
 
     it('should delete a subject', async () => {
-        const subjectId = await createSubjectFactory(db, {
+        const subjectId = await createSubjectFactory(testOperations, {
             name: 'subject to Delete'
         });
 
@@ -81,12 +76,12 @@ describe('Subject Routes', () => {
 
         expect(response.status).toBe(StatusCodes.OK);
 
-        const deletedsubject = await db.collection('testSubjects').findOne({ _id: subjectId });
+        const deletedsubject = await testOperations.findOne({ _id: subjectId });
         expect(deletedsubject).toBeNull();
     });
 
     it('should return 404 for non-existent subject on update', async () => {
-        const fakeId = new ObjectId().toString(); // Generate a fake ObjectId
+        const fakeId = new ObjectId().toString(); 
 
         const response = await request(app)
             .put(`/subjects/${fakeId}`)
@@ -96,7 +91,7 @@ describe('Subject Routes', () => {
     });
 
     it('should return 404 for non-existent subject on delete', async () => {
-        const fakeId = new ObjectId().toString(); // Generate a fake ObjectId
+        const fakeId = new ObjectId().toString(); 
 
         const response = await request(app).delete(`/subjects/${fakeId}`);
 

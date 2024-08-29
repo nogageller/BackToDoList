@@ -1,10 +1,10 @@
 const request = require('supertest');
 const express = require('express');
-const { MongoClient, ObjectId } = require('mongodb');
+const { ObjectId } = require('mongodb');
 const { StatusCodes } = require('http-status-codes');
-require('dotenv').config({ path: '.env.test' });
 const taskRouter = require('../routes/tasks.js');
 const createTaskFactory = require('./factories/taskFactory.js');
+const { connectDB, getCollectionOperations, closeDB } = require('../db/connect.js');
 
 process.env.NODE_ENV = 'test';
 
@@ -12,25 +12,21 @@ const app = express();
 app.use(express.json());
 app.use('/tasks', taskRouter);
 
-const mongoUrl = 'mongodb://localhost:27017';
-let db;
-let client;
+const testOperations = getCollectionOperations('testTasks');
 
 beforeAll(async () => {
-    client = await MongoClient.connect(mongoUrl);
-    db = client.db('testdb'); // Use a separate test database
-    console.log(`Connected to database: ${db.databaseName}`); // Debugging line
+    await connectDB()
 });
 
 afterAll(async () => {
-    await client.close();
+    await closeDB()
 });
 
 beforeEach(async () => {
     console.log('Clearing collection');
-    await db.collection('testTasks').deleteMany({});
+    await testOperations.deleteMany({});
     // After deleting tasks
-    const tasks = await db.collection('testTasks').find({}).toArray();
+    const tasks = await testOperations.find({});
     console.log('Tasks in DB after cleanup:', tasks);
 });
 
@@ -50,7 +46,7 @@ describe('Task Routes', () => {
     });
 
     it('should get all tasks', async () => {
-        await createTaskFactory(db, {
+        await createTaskFactory(testOperations, {
             name: 'Test Task',
             subject: 'Testing',
             priority: 1,
@@ -64,7 +60,7 @@ describe('Task Routes', () => {
     });
 
     it('should update a task', async () => {
-        const taskId = await createTaskFactory(db, {
+        const taskId = await createTaskFactory(testOperations, {
             name: 'Old Task',
             subject: 'Testing',
             priority: 2,
@@ -77,13 +73,13 @@ describe('Task Routes', () => {
 
         expect(response.status).toBe(StatusCodes.OK);
 
-        const updatedTask = await db.collection('testTasks').findOne({ _id: taskId });
+        const updatedTask = await testOperations.findOne({ _id: taskId });
         expect(updatedTask.name).toBe('Updated Task');
         expect(updatedTask.priority).toBe(10);
     });
 
     it('should delete a task', async () => {
-        const taskId = await createTaskFactory(db, {
+        const taskId = await createTaskFactory(testOperations, {
             name: 'Task to Delete',
             subject: 'Testing',
             priority: 4,
@@ -94,12 +90,12 @@ describe('Task Routes', () => {
 
         expect(response.status).toBe(StatusCodes.OK);
 
-        const deletedTask = await db.collection('testTasks').findOne({ _id: taskId });
+        const deletedTask = await testOperations.findOne({ _id: taskId });
         expect(deletedTask).toBeNull();
     });
 
     it('should return 404 for non-existent task on update', async () => {
-        const fakeId = new ObjectId().toString(); // Generate a fake ObjectId
+        const fakeId = new ObjectId().toString(); 
 
         const response = await request(app)
             .put(`/tasks/${fakeId}`)
@@ -109,7 +105,7 @@ describe('Task Routes', () => {
     });
 
     it('should return 404 for non-existent task on delete', async () => {
-        const fakeId = new ObjectId().toString(); // Generate a fake ObjectId
+        const fakeId = new ObjectId().toString(); 
 
         const response = await request(app).delete(`/tasks/${fakeId}`);
 

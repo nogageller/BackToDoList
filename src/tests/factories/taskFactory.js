@@ -1,6 +1,5 @@
-const { ObjectId } = require('mongodb');
 
-const createTaskFactory = async (db, taskData = {}) => {
+const createTaskFactory = async (testOperations, taskData = {}) => {
     const defaultTask = {
         name: 'Default Task',
         subject: 'General',
@@ -9,10 +8,9 @@ const createTaskFactory = async (db, taskData = {}) => {
     };
 
     const task = { ...defaultTask, ...taskData };
-    const result = await db.collection('testTasks').insertOne(task);
+    const result = await testOperations.insertOne(task);
 
-    // After inserting task
-    const tasks = await db.collection('testTasks').find({}).toArray();
+    const tasks = await testOperations.find({});
     console.log('Tasks in DB:', tasks);
     
     return result.insertedId;
