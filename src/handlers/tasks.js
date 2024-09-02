@@ -25,9 +25,9 @@ const deleteTask = async (req, res) => {
 
 const deleteDoneTask = async (req, res) => {
     const result = await tasksOperations.deleteMany({ isChecked: true });
-    
+
     if (result.deletedCount === 0) {
-        return res.status(StatusCodes.NOT_FOUND).json({ message: 'Task not found' });
+        return res.status(StatusCodes.OK).json({ message: 'Task not found' });
     }
 
     return res.status(StatusCodes.OK).json(result);

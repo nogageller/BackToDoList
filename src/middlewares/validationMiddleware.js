@@ -3,15 +3,14 @@ const { StatusCodes } = require('http-status-codes');
 const validateSchema = (schema, validateType = 'body') => (req, res, next) => {
     const data = validateType === 'body' ? req.body : req.params;
     const { error } = schema.validate(data, {
-        abortEarly: false,
+        abortEarly: true,
         allowUnknown: false
     });
 
     if (error) {
-        return res.status(StatusCodes.BAD_REQUEST).json({
-            message: 'Invalid request data',
-            details: error.details
-        });
+        const validationError = new Error('Invalid request data');
+        validationError.status = StatusCodes.BAD_REQUEST;
+        throw validationError;
     }
 
     next();

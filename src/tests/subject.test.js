@@ -3,7 +3,7 @@ const express = require('express');
 const { ObjectId } = require('mongodb');
 const { StatusCodes } = require('http-status-codes');
 const subjectRouter = require('../routes/subjects.js');
-const createSubjectFactory = require('./factories/subjectFactory.js');
+const subjectFactory = require('./factories/subjectFactory.js');
 const { connectDB, closeDB, getCollectionOperations } = require('../db/connect.js');
 
 process.env.NODE_ENV = 'test';
@@ -15,98 +15,106 @@ app.use('/subjects', subjectRouter);
 const testOperations = getCollectionOperations('testSubjects');
 
 beforeAll(async () => {
-    await connectDB()
+    await connectDB();
 });
 
 afterAll(async () => {
-    await closeDB()
+    await closeDB();
 });
 
 beforeEach(async () => {
     console.log('Clearing collection');
     await testOperations.deleteMany({});
     const subjects = await testOperations.find({});
-    console.log('subjects in DB after cleanup:', subjects);
+    console.log('Subjects in DB after cleanup:', subjects);
 });
 
 describe('Subject Routes', () => {
-    it('should create a subject', async () => {
-        const subject = {
-            name: 'Test subject'
-        };
 
-        const response = await request(app).post('/subjects').send(subject);
+    describe('POST', () => {
+        it('should create a subject', async () => {
+            const subject = {
+                name: 'Test subject'
+            };
 
-        expect(response.status).toBe(StatusCodes.CREATED);
-        expect(response.body).toHaveProperty('insertedId');
-    });
+            const response = await request(app).post('/subjects').send(subject);
 
-    it('should get all subjects', async () => {
-        await createSubjectFactory(testOperations, {
-            name: 'Test subject'
+            expect(response.status).toBe(StatusCodes.CREATED);
+            expect(response.body).toHaveProperty('insertedId');
         });
 
-        const response = await request(app).get('/subjects');
+        it('should return 400 for another subject parameter which is not allowed', async () => {
+            const subject = {
+                name: 'Test Subject',
+                date: 10,
+            };
 
-        expect(response.status).toBe(StatusCodes.OK);
-        expect(response.body).toHaveLength(1);
+            const response = await request(app).post('/subjects').send(subject);
+
+            expect(response.status).toBe(StatusCodes.BAD_REQUEST);
+        });
     });
 
-    it('should update a subject', async () => {
-        const subjectId = await createSubjectFactory(testOperations, {
-            name: 'Old subject'
+    describe('GET', () => {
+        it('should get all subjects', async () => {
+            await subjectFactory(testOperations, {
+                name: 'Test subject'
+            });
+
+            const response = await request(app).get('/subjects');
+
+            expect(response.status).toBe(StatusCodes.OK);
+            expect(response.body).toHaveLength(1);
+        });
+    });
+
+    describe('PUT', () => {
+        it('should update a subject', async () => {
+            const subjectId = await subjectFactory(testOperations, {
+                name: 'Old subject'
+            });
+
+            const response = await request(app)
+                .put(`/subjects/${subjectId}`)
+                .send({ name: 'Updated subject' });
+
+            expect(response.status).toBe(StatusCodes.OK);
+
+            const updatedSubject = await testOperations.findOne({ _id: subjectId });
+            expect(updatedSubject.name).toBe('Updated subject');
         });
 
-        const response = await request(app)
-            .put(`/subjects/${subjectId}`)
-            .send({ name: 'Updated subject' });
+        it('should return 404 for non-existent subject on update', async () => {
+            const fakeId = new ObjectId().toString();
 
-        expect(response.status).toBe(StatusCodes.OK);
+            const response = await request(app)
+                .put(`/subjects/${fakeId}`)
+                .send({ name: 'Updated subject' });
 
-        const updatedsubject = await testOperations.findOne({ _id: subjectId });
-        expect(updatedsubject.name).toBe('Updated subject');
+            expect(response.status).toBe(StatusCodes.NOT_FOUND);
+        });
     });
 
-    it('should delete a subject', async () => {
-        const subjectId = await createSubjectFactory(testOperations, {
-            name: 'subject to Delete'
+    describe('DELETE', () => {
+        it('should delete a subject', async () => {
+            const subjectId = await subjectFactory(testOperations, {
+                name: 'Subject to Delete'
+            });
+
+            const response = await request(app).delete(`/subjects/${subjectId}`);
+
+            expect(response.status).toBe(StatusCodes.OK);
+
+            const deletedSubject = await testOperations.findOne({ _id: subjectId });
+            expect(deletedSubject).toBeNull();
         });
 
-        const response = await request(app).delete(`/subjects/${subjectId}`);
+        it('should return 404 for non-existent subject on delete', async () => {
+            const fakeId = new ObjectId().toString();
 
-        expect(response.status).toBe(StatusCodes.OK);
+            const response = await request(app).delete(`/subjects/${fakeId}`);
 
-        const deletedsubject = await testOperations.findOne({ _id: subjectId });
-        expect(deletedsubject).toBeNull();
-    });
-
-    it('should return 404 for non-existent subject on update', async () => {
-        const fakeId = new ObjectId().toString(); 
-
-        const response = await request(app)
-            .put(`/subjects/${fakeId}`)
-            .send({ name: 'Updated subject' });
-
-        expect(response.status).toBe(StatusCodes.NOT_FOUND);
-    });
-
-    it('should return 404 for non-existent subject on delete', async () => {
-        const fakeId = new ObjectId().toString(); 
-
-        const response = await request(app).delete(`/subjects/${fakeId}`);
-
-        expect(response.status).toBe(StatusCodes.NOT_FOUND);
-    });
-
-    it('should return 400 for another subject parameter which is not allowed', async () => {
-        const subject = {
-            name: 'Test Subject',
-            date: 10,
-        };
-
-        const response = await request(app).post('/subjects').send(subject);
-
-        expect(response.status).toBe(StatusCodes.BAD_REQUEST);
+            expect(response.status).toBe(StatusCodes.NOT_FOUND);
+        });
     });
 });
-

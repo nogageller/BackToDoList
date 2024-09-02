@@ -15,11 +15,11 @@ app.use('/tasks', taskRouter);
 const testOperations = getCollectionOperations('testTasks');
 
 beforeAll(async () => {
-    await connectDB()
+    await connectDB();
 });
 
 afterAll(async () => {
-    await closeDB()
+    await closeDB();
 });
 
 beforeEach(async () => {
@@ -31,115 +31,123 @@ beforeEach(async () => {
 });
 
 describe('Task Routes', () => {
-    it('should create a task', async () => {
-        const task = {
-            name: 'Test Task',
-            subject: 'Testing',
-            priority: 10,
-            isChecked: false,
-        };
 
-        const response = await request(app).post('/tasks').send(task);
+    describe('POST', () => {
+        it('should create a task', async () => {
+            const task = {
+                name: 'Test Task',
+                subject: 'Testing',
+                priority: 10,
+                isChecked: false,
+            };
 
-        expect(response.status).toBe(StatusCodes.CREATED);
-        expect(response.body).toHaveProperty('insertedId');
-    });
+            const response = await request(app).post('/tasks').send(task);
 
-    it('should get all tasks', async () => {
-        await createTaskFactory(testOperations, {
-            name: 'Test Task',
-            subject: 'Testing',
-            priority: 1,
-            isChecked: false,
+            expect(response.status).toBe(StatusCodes.CREATED);
+            expect(response.body).toHaveProperty('insertedId');
         });
 
-        const response = await request(app).get('/tasks');
+        it('should return 400 for another task parameter which is not allowed', async () => {
+            const task = {
+                name: 'Test Task',
+                subject: 'Testing',
+                priority: 10,
+                isChecked: false,
+                date: 10,
+            };
 
-        expect(response.status).toBe(StatusCodes.OK);
-        expect(response.body).toHaveLength(1);
+            const response = await request(app).post('/tasks').send(task);
+
+            expect(response.status).toBe(StatusCodes.BAD_REQUEST);
+        });
     });
 
-    it('should update a task', async () => {
-        const taskId = await createTaskFactory(testOperations, {
-            name: 'Old Task',
-            subject: 'Testing',
-            priority: 2,
-            isChecked: false,
+    describe('GET', () => {
+        it('should get all tasks', async () => {
+            await createTaskFactory(testOperations, {
+                name: 'Test Task',
+                subject: 'Testing',
+                priority: 1,
+                isChecked: false,
+            });
+
+            const response = await request(app).get('/tasks');
+
+            expect(response.status).toBe(StatusCodes.OK);
+            expect(response.body).toHaveLength(1);
+        });
+    });
+
+    describe('PUT', () => {
+        it('should update a task', async () => {
+            const taskId = await createTaskFactory(testOperations, {
+                name: 'Old Task',
+                subject: 'Testing',
+                priority: 2,
+                isChecked: false,
+            });
+
+            const response = await request(app)
+                .put(`/tasks/${taskId}`)
+                .send({ name: 'Updated Task', priority: 10 });
+
+            expect(response.status).toBe(StatusCodes.OK);
+
+            const updatedTask = await testOperations.findOne({ _id: taskId });
+            expect(updatedTask.name).toBe('Updated Task');
+            expect(updatedTask.priority).toBe(10);
         });
 
-        const response = await request(app)
-            .put(`/tasks/${taskId}`)
-            .send({ name: 'Updated Task', priority: 10 });
+        it('should return 404 for non-existent task on update', async () => {
+            const fakeId = new ObjectId().toString();
 
-        expect(response.status).toBe(StatusCodes.OK);
+            const response = await request(app)
+                .put(`/tasks/${fakeId}`)
+                .send({ name: 'Updated Task' });
 
-        const updatedTask = await testOperations.findOne({ _id: taskId });
-        expect(updatedTask.name).toBe('Updated Task');
-        expect(updatedTask.priority).toBe(10);
+            expect(response.status).toBe(StatusCodes.NOT_FOUND);
+        });
     });
 
-    it('should delete a task', async () => {
-        const taskId = await createTaskFactory(testOperations, {
-            name: 'Task to Delete',
-            subject: 'Testing',
-            priority: 4,
-            isChecked: false,
+    describe('DELETE', () => {
+        it('should delete a task', async () => {
+            const taskId = await createTaskFactory(testOperations, {
+                name: 'Task to Delete',
+                subject: 'Testing',
+                priority: 4,
+                isChecked: false,
+            });
+
+            const response = await request(app).delete(`/tasks/${taskId}`);
+
+            expect(response.status).toBe(StatusCodes.OK);
+
+            const deletedTask = await testOperations.findOne({ _id: taskId });
+            expect(deletedTask).toBeNull();
         });
 
-        const response = await request(app).delete(`/tasks/${taskId}`);
+        it('should return 404 for non-existent task on delete', async () => {
+            const fakeId = new ObjectId().toString();
 
-        expect(response.status).toBe(StatusCodes.OK);
+            const response = await request(app).delete(`/tasks/${fakeId}`);
 
-        const deletedTask = await testOperations.findOne({ _id: taskId });
-        expect(deletedTask).toBeNull();
-    });
-
-    it('should delete all done tasks', async () => {
-        const taskId = await createTaskFactory(testOperations, {
-            name: 'Task to Delete',
-            subject: 'Testing',
-            priority: 4,
-            isChecked: true,
+            expect(response.status).toBe(StatusCodes.NOT_FOUND);
         });
 
-        const response = await request(app).delete(`/tasks/deleteDone`);
+        it('should delete all done tasks', async () => {
+            const taskId = await createTaskFactory(testOperations, {
+                name: 'Task to Delete',
+                subject: 'Testing',
+                priority: 4,
+                isChecked: true,
+            });
 
-        expect(response.status).toBe(StatusCodes.OK);
+            const response = await request(app).delete(`/tasks/deleteDone`);
 
-        const deletedTask = await testOperations.findOne({ _id: taskId });
-        expect(deletedTask).toBeNull();
-    });
+            expect(response.status).toBe(StatusCodes.OK);
 
-    it('should return 404 for non-existent task on update', async () => {
-        const fakeId = new ObjectId().toString(); 
-
-        const response = await request(app)
-            .put(`/tasks/${fakeId}`)
-            .send({ name: 'Updated Task' });
-
-        expect(response.status).toBe(StatusCodes.NOT_FOUND);
-    });
-
-    it('should return 404 for non-existent task on delete', async () => {
-        const fakeId = new ObjectId().toString(); 
-
-        const response = await request(app).delete(`/tasks/${fakeId}`);
-
-        expect(response.status).toBe(StatusCodes.NOT_FOUND);
-    });
-
-    it('should return 400 for another task parameter which is not allowed', async () => {
-        const task = {
-            name: 'Test Task',
-            subject: 'Testing',
-            priority: 10,
-            isChecked: false,
-            date: 10,
-        };
-
-        const response = await request(app).post('/tasks').send(task);
-
-        expect(response.status).toBe(StatusCodes.BAD_REQUEST);
+            const deletedTask = await testOperations.findOne({ _id: taskId });
+            expect(deletedTask).toBeNull();
+        });
     });
 });
-

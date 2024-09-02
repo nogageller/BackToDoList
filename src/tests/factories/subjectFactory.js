@@ -1,5 +1,5 @@
 
-const createSubjectFactory = async (testOperations, subjectData = {}) => {
+const subjectFactory = async (testOperations, subjectData = {}) => {
     const defaultSubject = {
         name: 'Default Subject'
     };
@@ -13,4 +13,4 @@ const createSubjectFactory = async (testOperations, subjectData = {}) => {
     return result.insertedId;
 };
 
-module.exports = createSubjectFactory;
+module.exports = subjectFactory;
