@@ -23,6 +23,16 @@ const deleteTask = async (req, res) => {
     return res.status(StatusCodes.OK).json(result);
 };
 
+const deleteDoneTask = async (req, res) => {
+    const result = await tasksOperations.deleteMany({ isChecked: true });
+    
+    if (result.deletedCount === 0) {
+        return res.status(StatusCodes.NOT_FOUND).json({ message: 'Task not found' });
+    }
+
+    return res.status(StatusCodes.OK).json(result);
+};
+
 const getTasks = async (req, res) => {
     const tasks = await tasksOperations.find({});
     return res.status(StatusCodes.OK).json(tasks);
@@ -51,4 +61,4 @@ const updateTask = async (req, res) => {
     return res.status(StatusCodes.OK).json(result);
 };
 
-module.exports = { createTask, deleteTask, getTasks, updateTask };
+module.exports = { createTask, deleteTask, deleteDoneTask, getTasks, updateTask };

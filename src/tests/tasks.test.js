@@ -94,6 +94,22 @@ describe('Task Routes', () => {
         expect(deletedTask).toBeNull();
     });
 
+    it('should delete all done tasks', async () => {
+        const taskId = await createTaskFactory(testOperations, {
+            name: 'Task to Delete',
+            subject: 'Testing',
+            priority: 4,
+            isChecked: true,
+        });
+
+        const response = await request(app).delete(`/tasks/deleteDone`);
+
+        expect(response.status).toBe(StatusCodes.OK);
+
+        const deletedTask = await testOperations.findOne({ _id: taskId });
+        expect(deletedTask).toBeNull();
+    });
+
     it('should return 404 for non-existent task on update', async () => {
         const fakeId = new ObjectId().toString(); 
 
