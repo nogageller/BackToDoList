@@ -10,5 +10,6 @@ router.post('/', validateSchema(taskSchema), createTask)
 router.delete('/:id', validateSchema(idSchema, 'params'), deleteTask)
 router.get('/', getTasks)
 router.put('/:id', validateSchema(idSchema, 'params'), validateSchema(updateTaskSchema), updateTask)
+router.patch('/:id', validateSchema(idSchema, 'params'), validateSchema(updateTaskSchema), updateTask)
 
 module.exports = router;

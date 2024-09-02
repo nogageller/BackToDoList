@@ -31,13 +31,13 @@ const getTasks = async (req, res) => {
 const updateTask = async (req, res) => {
     const { id } = req.params;
     const objectId = new ObjectId(id);
-    const { name, subject, priority, completed } = req.body;
+    const { name, subject, priority, isChecked } = req.body;
 
     const updateFields = {};
     if (name !== undefined) updateFields.name = name;
     if (subject !== undefined) updateFields.subject = subject;
     if (priority !== undefined) updateFields.priority = priority;
-    if (completed !== undefined) updateFields.completed = completed;
+    if (isChecked !== undefined) updateFields.isChecked = isChecked;
 
     const result = await tasksOperations.updateOne(
         { _id: objectId },
