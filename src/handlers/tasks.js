@@ -38,16 +38,26 @@ const getTasks = async (req, res) => {
     return res.status(StatusCodes.OK).json(tasks);
 };
 
-const updateTask = async (req, res) => {
+const extractParameters = (req) => {
     const { id } = req.params;
-    const objectId = new ObjectId(id);
     const { name, subject, priority, isChecked } = req.body;
+    return { id, name, subject, priority, isChecked };
+};
 
+const buildUpdateFields = (name, subject, priority, isChecked) => {
     const updateFields = {};
     if (name !== undefined) updateFields.name = name;
     if (subject !== undefined) updateFields.subject = subject;
     if (priority !== undefined) updateFields.priority = priority;
     if (isChecked !== undefined) updateFields.isChecked = isChecked;
+    return updateFields;
+};
+
+const updateTask = async (req, res) => {
+    const { id, name, subject, priority, isChecked } = extractParameters(req);
+    const objectId = new ObjectId(id);
+
+    const updateFields = buildUpdateFields(name, subject, priority, isChecked);
 
     const result = await tasksOperations.updateOne(
         { _id: objectId },

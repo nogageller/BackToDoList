@@ -25,7 +25,6 @@ afterAll(async () => {
 beforeEach(async () => {
     console.log('Clearing collection');
     await testOperations.deleteMany({});
-    // After deleting tasks
     const tasks = await testOperations.find({});
     console.log('Tasks in DB after cleanup:', tasks);
 });
@@ -106,6 +105,26 @@ describe('Task Routes', () => {
                 .send({ name: 'Updated Task' });
 
             expect(response.status).toBe(StatusCodes.NOT_FOUND);
+        });
+    });
+
+    describe('PATCH', () => {
+        it('should check a task', async () => {
+            const taskId = await createTaskFactory(testOperations, {
+                name: 'Old Task',
+                subject: 'Testing',
+                priority: 2,
+                isChecked: false,
+            });
+
+            const response = await request(app)
+                .patch(`/tasks/${taskId}`)
+                .send({ name: 'Checked Task', isChecked: true });
+
+            expect(response.status).toBe(StatusCodes.OK);
+
+            const updatedTask = await testOperations.findOne({ _id: taskId });
+            expect(updatedTask.isChecked).toBe(true);
         });
     });
 

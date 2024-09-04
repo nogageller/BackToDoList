@@ -28,13 +28,25 @@ const getSubjects = async (req, res) => {
     return res.status(StatusCodes.OK).json(subjects);
 };
 
-const updateSubject = async (req, res) => {
+const extractParameters = (req) => {
     const { id } = req.params;
-    const objectId = new ObjectId(id);
     const { name } = req.body;
+    return { id, name };
+};
 
+const buildUpdateFields = (name) => {
     const updateFields = {};
-    if (name !== undefined) updateFields.name = name;
+    if (name !== undefined) {
+        updateFields.name = name;
+    }
+    return updateFields;
+};
+
+const updateSubject = async (req, res) => {
+    const { id, name } = extractParameters(req);
+    const objectId = new ObjectId(id);
+
+    const updateFields = buildUpdateFields(name);
 
     const result = await subjectsOperations.updateOne(
         { _id: objectId },

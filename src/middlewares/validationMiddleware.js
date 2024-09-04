@@ -10,6 +10,7 @@ const validateSchema = (schema, validateType = 'body') => (req, res, next) => {
     if (error) {
         const validationError = new Error('Invalid request data');
         validationError.status = StatusCodes.BAD_REQUEST;
+        validationError.details = error.details; 
         throw validationError;
     }
 
