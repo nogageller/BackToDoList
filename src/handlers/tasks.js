@@ -34,8 +34,26 @@ const deleteDoneTask = async (req, res) => {
 };
 
 const getTasks = async (req, res) => {
-    const tasks = await tasksOperations.find({});
-    return res.status(StatusCodes.OK).json(tasks);
+    const { filter = '', search = '' } = req.query;
+    let query = {};
+
+    switch (filter) {
+        case 'hideDone':
+            query.isChecked = false;
+            break;
+        case 'showDone':
+            query.isChecked = true;
+            break;
+        default:
+            break;
+    }
+
+    if (search) {
+        query.name = { $regex: new RegExp(search, 'i') };
+    }
+
+    const tasks = await tasksOperations.find(query);
+    res.status(StatusCodes.OK).json(tasks);
 };
 
 const extractParameters = (req) => {

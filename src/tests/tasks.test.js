@@ -73,6 +73,83 @@ describe('Task Routes', () => {
             expect(response.status).toBe(StatusCodes.OK);
             expect(response.body).toHaveLength(1);
         });
+
+        it('should filter tasks based on search query', async () => {
+            await createTaskFactory(testOperations, {
+                name: 'Test Task',
+                subject: 'Testing',
+                priority: 1,
+                isChecked: false
+            });
+            await createTaskFactory(testOperations, {
+                name: 'Another Task',
+                subject: 'Testing',
+                priority: 2,
+                isChecked: true
+            });
+
+            const response = await request(app).get('/tasks?search=Test');
+
+            expect(response.status).toBe(StatusCodes.OK);
+            expect(response.body).toHaveLength(1);
+            expect(response.body[0].name).toBe('Test Task');
+        });
+
+        it('should return empty array for non-matching search query', async () => {
+            await createTaskFactory(testOperations, {
+                name: 'Test Task',
+                subject: 'Testing',
+                priority: 1,
+                isChecked: false
+            });
+
+            const response = await request(app).get('/tasks?search=Nonexistent');
+
+            expect(response.status).toBe(StatusCodes.OK);
+            expect(response.body).toHaveLength(0);
+        });
+
+        it('should filter out completed tasks (hideDone)', async () => {
+            await createTaskFactory(testOperations, {
+                name: 'Done Task',
+                subject: 'Testing',
+                priority: 1,
+                isChecked: true
+            });
+            await createTaskFactory(testOperations, {
+                name: 'Pending Task',
+                subject: 'Testing',
+                priority: 2,
+                isChecked: false
+            });
+
+            const response = await request(app).get('/tasks?filter=hideDone');
+
+            expect(response.status).toBe(StatusCodes.OK);
+            expect(response.body).toHaveLength(1);
+            expect(response.body[0].name).toBe('Pending Task');
+        });
+
+        it('should show only completed tasks (showDone)', async () => {
+            await createTaskFactory(testOperations, {
+                name: 'Done Task',
+                subject: 'Testing',
+                priority: 1,
+                isChecked: true
+            });
+            await createTaskFactory(testOperations, {
+                name: 'Pending Task',
+                subject: 'Testing',
+                priority: 2,
+                isChecked: false
+            });
+
+            const response = await request(app).get('/tasks?filter=showDone');
+
+            expect(response.status).toBe(StatusCodes.OK);
+            expect(response.body).toHaveLength(1);
+            expect(response.body[0].name).toBe('Done Task');
+        });
     });
 
     describe('PUT', () => {
