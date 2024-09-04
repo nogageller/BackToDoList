@@ -25,8 +25,6 @@ afterAll(async () => {
 beforeEach(async () => {
     console.log('Clearing collection');
     await testOperations.deleteMany({});
-    const subjects = await testOperations.find({});
-    console.log('Subjects in DB after cleanup:', subjects);
 });
 
 describe('Subject Routes', () => {

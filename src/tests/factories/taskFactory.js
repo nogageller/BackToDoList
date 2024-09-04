@@ -1,3 +1,4 @@
+const _ = require('lodash');
 
 const createTaskFactory = async (testOperations, taskData = {}) => {
     const defaultTask = {
@@ -7,11 +8,8 @@ const createTaskFactory = async (testOperations, taskData = {}) => {
         isChecked: false,
     };
 
-    const task = { ...defaultTask, ...taskData };
+    const task = _.merge({}, defaultTask, taskData);
     const result = await testOperations.insertOne(task);
-
-    const tasks = await testOperations.find({});
-    console.log('Tasks in DB:', tasks);
     
     return result.insertedId;
 };
