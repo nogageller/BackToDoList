@@ -1,5 +1,6 @@
 const { ObjectId } = require('mongodb');
 const Joi = require('joi');
+const _ = require('lodash');
 const { StatusCodes } = require('http-status-codes');
 const { getCollectionOperations } = require('../db/connect')
 
@@ -35,11 +36,8 @@ const extractParameters = (req) => {
 };
 
 const buildUpdateFields = (name) => {
-    const updateFields = {};
-    if (name !== undefined) {
-        updateFields.name = name;
-    }
-    return updateFields;
+    const updateFields = { name };
+    return _.omitBy(updateFields, _.isUndefined);
 };
 
 const updateSubject = async (req, res) => {

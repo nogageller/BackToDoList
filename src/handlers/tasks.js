@@ -1,6 +1,7 @@
 const { ObjectId } = require('mongodb');
 const Joi = require('joi');
 const { StatusCodes } = require('http-status-codes');
+const _ = require('lodash');
 const { getCollectionOperations } = require('../db/connect')
 
 const tasksOperations = getCollectionOperations(process.env.NODE_ENV === 'test' ? 'testTasks' : 'tasks')
@@ -63,12 +64,10 @@ const extractParameters = (req) => {
 };
 
 const buildUpdateFields = (name, subject, priority, isChecked) => {
-    const updateFields = {};
-    if (name !== undefined) updateFields.name = name;
-    if (subject !== undefined) updateFields.subject = subject;
-    if (priority !== undefined) updateFields.priority = priority;
-    if (isChecked !== undefined) updateFields.isChecked = isChecked;
-    return updateFields;
+    return _.omitBy(
+        { name, subject, priority, isChecked },
+        _.isUndefined
+    );
 };
 
 const updateTask = async (req, res) => {
