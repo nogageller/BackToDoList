@@ -12,7 +12,7 @@ const app = express();
 app.use(express.json());
 app.use('/tasks', taskRouter);
 
-const testOperations = getCollectionOperations('testTasks');
+const tasksOperations = getCollectionOperations('testTasks');
 
 beforeAll(async () => {
     await connectDB();
@@ -24,7 +24,7 @@ afterAll(async () => {
 
 beforeEach(async () => {
     console.log('Clearing collection');
-    await testOperations.deleteMany({});
+    await tasksOperations.deleteMany({});
 });
 
 describe('Task Routes', () => {
@@ -61,7 +61,7 @@ describe('Task Routes', () => {
 
     describe('GET', () => {
         it('should get all tasks', async () => {
-            await createTaskFactory(testOperations, {
+            await createTaskFactory({
                 name: 'Test Task',
                 subject: 'Testing',
                 priority: 1,
@@ -75,13 +75,13 @@ describe('Task Routes', () => {
         });
 
         it('should filter tasks based on search query', async () => {
-            await createTaskFactory(testOperations, {
+            await createTaskFactory({
                 name: 'Test Task',
                 subject: 'Testing',
                 priority: 1,
                 isChecked: false
             });
-            await createTaskFactory(testOperations, {
+            await createTaskFactory({
                 name: 'Another Task',
                 subject: 'Testing',
                 priority: 2,
@@ -96,7 +96,7 @@ describe('Task Routes', () => {
         });
 
         it('should return empty array for non-matching search query', async () => {
-            await createTaskFactory(testOperations, {
+            await createTaskFactory(tasksOperations, {
                 name: 'Test Task',
                 subject: 'Testing',
                 priority: 1,
@@ -110,13 +110,13 @@ describe('Task Routes', () => {
         });
 
         it('should filter out completed tasks (hideDone)', async () => {
-            await createTaskFactory(testOperations, {
+            await createTaskFactory({
                 name: 'Done Task',
                 subject: 'Testing',
                 priority: 1,
                 isChecked: true
             });
-            await createTaskFactory(testOperations, {
+            await createTaskFactory({
                 name: 'Pending Task',
                 subject: 'Testing',
                 priority: 2,
@@ -131,13 +131,13 @@ describe('Task Routes', () => {
         });
 
         it('should show only completed tasks (showDone)', async () => {
-            await createTaskFactory(testOperations, {
+            await createTaskFactory({
                 name: 'Done Task',
                 subject: 'Testing',
                 priority: 1,
                 isChecked: true
             });
-            await createTaskFactory(testOperations, {
+            await createTaskFactory({
                 name: 'Pending Task',
                 subject: 'Testing',
                 priority: 2,
@@ -154,7 +154,7 @@ describe('Task Routes', () => {
 
     describe('PUT', () => {
         it('should update a task', async () => {
-            const taskId = await createTaskFactory(testOperations, {
+            const taskId = await createTaskFactory({
                 name: 'Old Task',
                 subject: 'Testing',
                 priority: 2,
@@ -167,7 +167,7 @@ describe('Task Routes', () => {
 
             expect(response.status).toBe(StatusCodes.OK);
 
-            const updatedTask = await testOperations.findOne({ _id: taskId });
+            const updatedTask = await tasksOperations.findOne({ _id: taskId });
             expect(updatedTask.name).toBe('Updated Task');
             expect(updatedTask.priority).toBe(10);
         });
@@ -185,7 +185,7 @@ describe('Task Routes', () => {
 
     describe('PATCH', () => {
         it('should check a task', async () => {
-            const taskId = await createTaskFactory(testOperations, {
+            const taskId = await createTaskFactory({
                 name: 'Old Task',
                 subject: 'Testing',
                 priority: 2,
@@ -198,14 +198,14 @@ describe('Task Routes', () => {
 
             expect(response.status).toBe(StatusCodes.OK);
 
-            const updatedTask = await testOperations.findOne({ _id: taskId });
+            const updatedTask = await tasksOperations.findOne({ _id: taskId });
             expect(updatedTask.isChecked).toBe(true);
         });
     });
 
     describe('DELETE', () => {
         it('should delete a task', async () => {
-            const taskId = await createTaskFactory(testOperations, {
+            const taskId = await createTaskFactory({
                 name: 'Task to Delete',
                 subject: 'Testing',
                 priority: 4,
@@ -216,7 +216,7 @@ describe('Task Routes', () => {
 
             expect(response.status).toBe(StatusCodes.OK);
 
-            const deletedTask = await testOperations.findOne({ _id: taskId });
+            const deletedTask = await tasksOperations.findOne({ _id: taskId });
             expect(deletedTask).toBeNull();
         });
 
@@ -229,7 +229,7 @@ describe('Task Routes', () => {
         });
 
         it('should delete all done tasks', async () => {
-            const taskId = await createTaskFactory(testOperations, {
+            const taskId = await createTaskFactory({
                 name: 'Task to Delete',
                 subject: 'Testing',
                 priority: 4,
@@ -240,7 +240,7 @@ describe('Task Routes', () => {
 
             expect(response.status).toBe(StatusCodes.OK);
 
-            const deletedTask = await testOperations.findOne({ _id: taskId });
+            const deletedTask = await tasksOperations.findOne({ _id: taskId });
             expect(deletedTask).toBeNull();
         });
     });

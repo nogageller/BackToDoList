@@ -1,6 +1,9 @@
 const _ = require('lodash');
+const { getCollectionOperations } = require('../../db/connect');
 
-const createTaskFactory = async (testOperations, taskData = {}) => {
+const tasksOperations = getCollectionOperations('testTasks');
+
+const createTaskFactory = async (taskData = {}) => {
     const defaultTask = {
         name: 'Default Task',
         subject: 'General',
@@ -9,7 +12,7 @@ const createTaskFactory = async (testOperations, taskData = {}) => {
     };
 
     const task = _.merge({}, defaultTask, taskData);
-    const result = await testOperations.insertOne(task);
+    const result = await tasksOperations.insertOne(task);
     
     return result.insertedId;
 };

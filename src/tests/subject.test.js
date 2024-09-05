@@ -12,7 +12,7 @@ const app = express();
 app.use(express.json());
 app.use('/subjects', subjectRouter);
 
-const testOperations = getCollectionOperations('testSubjects');
+const subjectsOperations = getCollectionOperations('testSubjects');
 
 beforeAll(async () => {
     await connectDB();
@@ -24,7 +24,7 @@ afterAll(async () => {
 
 beforeEach(async () => {
     console.log('Clearing collection');
-    await testOperations.deleteMany({});
+    await subjectsOperations.deleteMany({});
 });
 
 describe('Subject Routes', () => {
@@ -55,7 +55,7 @@ describe('Subject Routes', () => {
 
     describe('GET', () => {
         it('should get all subjects', async () => {
-            await subjectFactory(testOperations, {
+            await subjectFactory({
                 name: 'Test subject'
             });
 
@@ -68,7 +68,7 @@ describe('Subject Routes', () => {
 
     describe('PUT', () => {
         it('should update a subject', async () => {
-            const subjectId = await subjectFactory(testOperations, {
+            const subjectId = await subjectFactory({
                 name: 'Old subject'
             });
 
@@ -78,7 +78,7 @@ describe('Subject Routes', () => {
 
             expect(response.status).toBe(StatusCodes.OK);
 
-            const updatedSubject = await testOperations.findOne({ _id: subjectId });
+            const updatedSubject = await subjectsOperations.findOne({ _id: subjectId });
             expect(updatedSubject.name).toBe('Updated subject');
         });
 
@@ -95,7 +95,7 @@ describe('Subject Routes', () => {
 
     describe('DELETE', () => {
         it('should delete a subject', async () => {
-            const subjectId = await subjectFactory(testOperations, {
+            const subjectId = await subjectFactory({
                 name: 'Subject to Delete'
             });
 
@@ -103,7 +103,7 @@ describe('Subject Routes', () => {
 
             expect(response.status).toBe(StatusCodes.OK);
 
-            const deletedSubject = await testOperations.findOne({ _id: subjectId });
+            const deletedSubject = await subjectsOperations.findOne({ _id: subjectId });
             expect(deletedSubject).toBeNull();
         });
 
