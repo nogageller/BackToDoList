@@ -59,8 +59,8 @@ const getTasks = async (req, res) => {
 
 const extractParameters = (req) => {
     const { id } = req.params;
-    const { name, subject, priority, isChecked } = req.body;
-    return { id, name, subject, priority, isChecked };
+    const { name, subject, priority, isChecked, location } = req.body;
+    return { id, name, subject, priority, isChecked, location };
 };
 
 const buildUpdateFields = (name, subject, priority, isChecked, location) => {
