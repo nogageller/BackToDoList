@@ -9,6 +9,10 @@ const createTaskFactory = async (taskData = {}) => {
         subject: 'General',
         priority: 5,
         isChecked: false,
+        location: {
+            type: 'Point',
+            coordinates: [36.5552, 14.76454]
+        },
     };
 
     const task = _.merge({}, defaultTask, taskData);

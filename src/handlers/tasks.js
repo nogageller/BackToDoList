@@ -63,18 +63,18 @@ const extractParameters = (req) => {
     return { id, name, subject, priority, isChecked };
 };
 
-const buildUpdateFields = (name, subject, priority, isChecked) => {
+const buildUpdateFields = (name, subject, priority, isChecked, location) => {
     return _.omitBy(
-        { name, subject, priority, isChecked },
+        { name, subject, priority, isChecked, location },
         _.isUndefined
     );
 };
 
 const updateTask = async (req, res) => {
-    const { id, name, subject, priority, isChecked } = extractParameters(req);
+    const { id, name, subject, priority, isChecked, location } = extractParameters(req);
     const objectId = new ObjectId(id);
 
-    const updateFields = buildUpdateFields(name, subject, priority, isChecked);
+    const updateFields = buildUpdateFields(name, subject, priority, isChecked, location);
 
     const result = await tasksOperations.updateOne(
         { _id: objectId },

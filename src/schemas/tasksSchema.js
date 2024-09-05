@@ -1,10 +1,16 @@
 const Joi = require('joi');
 
+const geoJsonSchema = Joi.object({
+    type: Joi.string().valid('Point').required(),
+    coordinates: Joi.array().items(Joi.number()).length(2).required() 
+}).required();
+
 const taskSchema = Joi.object({
     name: Joi.string().min(1).max(50).required(),
     subject: Joi.string().max(100).required(),
     priority: Joi.number().integer().min(0).max(10).required(),
-    isChecked: Joi.boolean().required()
+    isChecked: Joi.boolean().required(),
+    location: geoJsonSchema 
 }).strict();
 
 const updateTaskSchema = Joi.object({

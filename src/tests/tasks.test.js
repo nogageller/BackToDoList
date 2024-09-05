@@ -36,6 +36,10 @@ describe('Task Routes', () => {
                 subject: 'Testing',
                 priority: 10,
                 isChecked: false,
+                location: {
+                    type: 'Point',
+                    coordinates: [36.5552, 14.76454] 
+                },
             };
 
             const response = await request(app).post('/tasks').send(task);
@@ -50,6 +54,10 @@ describe('Task Routes', () => {
                 subject: 'Testing',
                 priority: 10,
                 isChecked: false,
+                location: {
+                    type: 'Point',
+                    coordinates: [36.5552, 14.76454]
+                },
                 date: 10,
             };
 
@@ -66,6 +74,10 @@ describe('Task Routes', () => {
                 subject: 'Testing',
                 priority: 1,
                 isChecked: false,
+                location: {
+                    type: 'Point',
+                    coordinates: [36.5552, 14.76454]
+                },
             });
 
             const response = await request(app).get('/tasks');
@@ -79,13 +91,21 @@ describe('Task Routes', () => {
                 name: 'Test Task',
                 subject: 'Testing',
                 priority: 1,
-                isChecked: false
+                isChecked: false,
+                location: {
+                    type: 'Point',
+                    coordinates: [36.5552, 14.76454]
+                },
             });
             await createTaskFactory({
                 name: 'Another Task',
                 subject: 'Testing',
                 priority: 2,
-                isChecked: true
+                isChecked: true,
+                location: {
+                    type: 'Point',
+                    coordinates: [36.5552, 14.76454]
+                },
             });
 
             const response = await request(app).get('/tasks?search=Test');
@@ -100,7 +120,11 @@ describe('Task Routes', () => {
                 name: 'Test Task',
                 subject: 'Testing',
                 priority: 1,
-                isChecked: false
+                isChecked: false, 
+                location: {
+                    type: 'Point',
+                    coordinates: [36.5552, 14.76454]
+                },
             });
 
             const response = await request(app).get('/tasks?search=Nonexistent');
@@ -114,13 +138,21 @@ describe('Task Routes', () => {
                 name: 'Done Task',
                 subject: 'Testing',
                 priority: 1,
-                isChecked: true
+                isChecked: true,
+                location: {
+                    type: 'Point',
+                    coordinates: [36.5552, 14.76454]
+                },
             });
             await createTaskFactory({
                 name: 'Pending Task',
                 subject: 'Testing',
                 priority: 2,
-                isChecked: false
+                isChecked: false,
+                location: {
+                    type: 'Point',
+                    coordinates: [36.5552, 14.76454]
+                },
             });
 
             const response = await request(app).get('/tasks?filter=hideDone');
@@ -135,13 +167,21 @@ describe('Task Routes', () => {
                 name: 'Done Task',
                 subject: 'Testing',
                 priority: 1,
-                isChecked: true
+                isChecked: true,
+                location: {
+                    type: 'Point',
+                    coordinates: [36.5552, 14.76454]
+                },
             });
             await createTaskFactory({
                 name: 'Pending Task',
                 subject: 'Testing',
                 priority: 2,
-                isChecked: false
+                isChecked: false,
+                location: {
+                    type: 'Point',
+                    coordinates: [36.5552, 14.76454]
+                },
             });
 
             const response = await request(app).get('/tasks?filter=showDone');
@@ -159,6 +199,10 @@ describe('Task Routes', () => {
                 subject: 'Testing',
                 priority: 2,
                 isChecked: false,
+                location: {
+                    type: 'Point',
+                    coordinates: [36.5552, 14.76454]
+                },
             });
 
             const response = await request(app)
@@ -190,6 +234,10 @@ describe('Task Routes', () => {
                 subject: 'Testing',
                 priority: 2,
                 isChecked: false,
+                location: {
+                    type: 'Point',
+                    coordinates: [36.5552, 14.76454]
+                },
             });
 
             const response = await request(app)
@@ -210,6 +258,10 @@ describe('Task Routes', () => {
                 subject: 'Testing',
                 priority: 4,
                 isChecked: false,
+                location: {
+                    type: 'Point',
+                    coordinates: [36.5552, 14.76454]
+                },
             });
 
             const response = await request(app).delete(`/tasks/${taskId}`);
@@ -234,6 +286,10 @@ describe('Task Routes', () => {
                 subject: 'Testing',
                 priority: 4,
                 isChecked: true,
+                location: {
+                    type: 'Point',
+                    coordinates: [36.5552, 14.76454]
+                },
             });
 
             const response = await request(app).delete(`/tasks/deleteDone`);
