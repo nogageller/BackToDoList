@@ -2,7 +2,7 @@ const Joi = require('joi');
 
 const geoJsonSchema = Joi.object({
     type: Joi.string().valid('Point').required(),
-    coordinates: Joi.array().items(Joi.number()).length(2).required() 
+    coordinates: Joi.array().items().length(2).required() 
 });
 
 const taskSchema = Joi.object({
